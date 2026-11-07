@@ -1,0 +1,37 @@
+# ---- Web / UI ----
+gradio>=5.0   # tested API-compatible with 5.x and 6.x
+fastapi>=0.110
+uvicorn>=0.29
+
+# ---- Config / validation ----
+pydantic>=2.6
+pydantic-settings>=2.2
+python-dotenv>=1.0
+
+# ---- LangChain (agent framework) ----
+langchain-core>=0.3
+langchain-community>=0.3
+langchain-openai>=0.2          # API mode (any OpenAI-compatible endpoint, incl. llama-server)
+# llama-cpp-python>=0.2.90     # local llama.cpp mode (in-process GGUF); build with CUDA as needed
+
+# ---- Geospatial ----
+numpy
+pandas
+pillow
+scipy>=1.11
+shapely>=2.0
+pyproj
+geopandas>=1.0
+rasterio>=1.3
+rio-tiler>=6.0
+
+# ---- Office output ----
+openpyxl>=3.1
+python-docx>=1.1
+
+# ---- Segmentation ----
+# SAM3: install from the official repository and make sure the checkpoint is accessible.
+# For UI debugging without GPU set NURSERY_SEG_BACKEND=mock.
+
+# ---- Dev ----
+pytest>=8.0

@@ -1,0 +1,179 @@
+{
+  "asset_ledger": {
+    "label": "区域苗木资产核算表",
+    "title": "{region_name}苗木资产核算表",
+    "default_region_name": "区域",
+    "meta": [
+      [
+        "区域名称",
+        "{region_display}"
+      ],
+      [
+        "核算日期",
+        "{date}"
+      ],
+      [
+        "数据来源",
+        "{image_name}"
+      ],
+      [
+        "估值方式",
+        "{mode_text}"
+      ]
+    ],
+    "needs_price": true,
+    "sheets": [
+      {
+        "name": "资产核算表",
+        "source": "trees",
+        "columns": [
+          {
+            "header": "序号",
+            "field": "index",
+            "width": 8
+          },
+          {
+            "header": "树种",
+            "field": "species",
+            "width": 16
+          },
+          {
+            "header": "等效冠幅(m)",
+            "field": "crown_d_m",
+            "width": 14,
+            "format": "0.00"
+          },
+          {
+            "header": "树高(m)",
+            "field": "height_m",
+            "width": 12,
+            "format": "0.00",
+            "requires": "dem"
+          },
+          {
+            "header": "价格(元)",
+            "field": "price",
+            "width": 18,
+            "format": "#,##0.00"
+          }
+        ],
+        "total": {
+          "label": "合计（共 {n} 株）",
+          "sum_fields": [
+            "price"
+          ]
+        }
+      },
+      {
+        "name": "树种汇总",
+        "source": "species",
+        "columns": [
+          {
+            "header": "序号",
+            "field": "index",
+            "width": 8
+          },
+          {
+            "header": "树种",
+            "field": "species",
+            "width": 16
+          },
+          {
+            "header": "数量(株)",
+            "field": "count",
+            "width": 12,
+            "format": "0"
+          },
+          {
+            "header": "平均单价(元/株)",
+            "field": "avg_price",
+            "width": 18,
+            "format": "#,##0.00"
+          },
+          {
+            "header": "资产价值(元)",
+            "field": "value",
+            "width": 18,
+            "format": "#,##0.00"
+          }
+        ],
+        "total": {
+          "label": "合计",
+          "sum_fields": [
+            "count",
+            "value"
+          ]
+        }
+      }
+    ]
+  },
+  "plot_census": {
+    "label": "地块普查报表",
+    "title": "{region_name}普查报表",
+    "default_region_name": "地块",
+    "meta": [
+      [
+        "地块名称",
+        "{region_display}"
+      ],
+      [
+        "普查日期",
+        "{date}"
+      ],
+      [
+        "数据来源",
+        "{image_name}"
+      ]
+    ],
+    "sheets": [
+      {
+        "name": "普查报表",
+        "source": "species",
+        "columns": [
+          {
+            "header": "序号",
+            "field": "index",
+            "width": 8
+          },
+          {
+            "header": "树种",
+            "field": "species",
+            "width": 16
+          },
+          {
+            "header": "株数",
+            "field": "count",
+            "width": 10,
+            "format": "0"
+          },
+          {
+            "header": "占比(%)",
+            "field": "share_pct",
+            "width": 12,
+            "format": "0.00"
+          },
+          {
+            "header": "平均冠幅(m)",
+            "field": "mean_crown_d_m",
+            "width": 14,
+            "format": "0.00"
+          },
+          {
+            "header": "冠幅总面积(m²)",
+            "field": "total_crown_area_m2",
+            "width": 18,
+            "format": "#,##0.00"
+          }
+        ],
+        "total": {
+          "label": "合计",
+          "sum_fields": [
+            "count",
+            "share_pct",
+            "total_crown_area_m2"
+          ]
+        }
+      }
+    ]
+  }
+}
