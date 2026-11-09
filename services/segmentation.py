@@ -241,34 +241,67 @@ class Sam3Backend(SegmentationBackend):
     def segment(
         self, image_path: Path, prompt: str, rescale: Optional[tuple[float, float]] = None
     ) -> SegmentationResult:
-        """See :meth:`SegmentationBackend.segment`.
-
-        All window masks of this prompt are OR-ed into one full-size raster
-        (disk-backed, so large images fit), then cleaned and counted.
-        """
+        """Segment all windows, merge masks on disk, then clean and count trees."""
         self._load()
         self._tmp_dir.mkdir(parents=True, exist_ok=True)
         raw_instances = 0
+
         with rasterio.open(image_path) as src, tempfile.TemporaryDirectory(dir=self._tmp_dir) as tmp:
             height, width = src.height, src.width
-            merged = np.memmap(Path(tmp) / "merged.u8", dtype=np.uint8, mode="w+", shape=(height, width))
-            windows = list(self._windows(width, height))
-            logger.info("SAM3 on %s with prompt %r: %d windows", image_path.name, prompt, len(windows))
-            for idx, window in enumerate(windows, 1):
-                tile = self._read_rgb(src, window, rescale)
-                win_mask = np.zeros((int(window.height), int(window.width)), dtype=bool)
-                for mask, _score in self._infer(tile, prompt):
-                    win_mask |= self._fit_mask(mask, win_mask.shape)
-                    raw_instances += 1
-                r0, c0 = int(window.row_off), int(window.col_off)
-                region = merged[r0 : r0 + win_mask.shape[0], c0 : c0 + win_mask.shape[1]]
-                np.bitwise_or(region, win_mask.view(np.uint8), out=region)
-                logger.debug("window %d/%d done, %d instances so far", idx, len(windows), raw_instances)
-            merged.flush()
-            polygons, areas, stats = mask_to_trees(merged, src.transform, src.crs, self._params)
-            crs = src.crs
-            del merged
-        logger.info("SAM3 finished: %d instances -> %d trees", raw_instances, stats.final_count)
+            merged = np.memmap(
+                Path(tmp) / "merged.u8",
+                dtype=np.uint8,
+                mode="w+",
+                shape=(height, width),
+            )
+            try:
+                windows = list(self._windows(width, height))
+                logger.info(
+                    "SAM3 on %s with prompt %r: %d windows",
+                    image_path.name, prompt, len(windows),
+                )
+                for idx, window in enumerate(windows, 1):
+                    tile = self._read_rgb(src, window, rescale)
+                    win_mask = np.zeros(
+                        (int(window.height), int(window.width)), dtype=bool
+                    )
+                    for mask, _score in self._infer(tile, prompt):
+                        win_mask |= self._fit_mask(mask, win_mask.shape)
+                        raw_instances += 1
+
+                    r0, c0 = int(window.row_off), int(window.col_off)
+                    region = merged[
+                        r0 : r0 + win_mask.shape[0],
+                        c0 : c0 + win_mask.shape[1],
+                    ]
+                    try:
+                        np.bitwise_or(region, win_mask.view(np.uint8), out=region)
+                    finally:
+                        # A memmap slice keeps the file mapping alive on Windows.
+                        del region
+
+                    logger.debug(
+                        "window %d/%d done, %d instances so far",
+                        idx, len(windows), raw_instances,
+                    )
+
+                merged.flush()
+                polygons, areas, stats = mask_to_trees(
+                    merged, src.transform, src.crs, self._params
+                )
+                crs = src.crs
+            finally:
+                # Close the mapping before TemporaryDirectory removes merged.u8.
+                # No views of merged may be used after this point.
+                mapping = merged._mmap
+                if mapping is not None and not mapping.closed:
+                    mapping.close()
+                del merged
+
+        logger.info(
+            "SAM3 finished: %d instances -> %d trees",
+            raw_instances, stats.final_count,
+        )
         return SegmentationResult(_finalize(polygons, areas, crs), stats, raw_instances)
 
 
