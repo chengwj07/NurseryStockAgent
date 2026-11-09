@@ -17,10 +17,10 @@ logger = logging.getLogger(__name__)
 
 TITLE_MD: str = """# 🌳 Nursery Asset Management Agent
 **Nursery Asset Management Agent** · An all-in-one assistant for remote-sensing based nursery stock: **extract → count → value → tables / reports**. Upload an image (GeoTIFF, or PNG/JPG) and give commands in natural language, for example:
-“Extract Podocarpus macrophyllus”, “Count the trees”, “Evaluate the value”, “Output the area nursery asset ledger”, “Generate the plot statistics report”."""
+“Extract podocarpus macrophyllus”, “Count the trees”, “Evaluate the value”, “Output the area nursery asset ledger”, “Generate the plot statistics report”."""
 
 EXAMPLES: list[str] = [
-    "Extract Buddhist Pine and count the trees",
+    "Extract podocarpus macrophyllus and count the trees",
     "Evaluate the value of the trees in the current image",
     "Output the area nursery asset ledger",
     "Output the plot census report",
@@ -182,7 +182,7 @@ def build_demo(services: Services, agent: AgentService) -> gr.Blocks:
         chatbot = _make_chatbot()
         with gr.Row():
             textbox = gr.Textbox(
-                placeholder="Type a command, e.g. extract Buddhist Pine and count the trees", show_label=False, scale=8, lines=1
+                placeholder="Type a command, e.g. Extract podocarpus macrophyllus and count the trees", show_label=False, scale=8, lines=1
             )
             send_btn = gr.Button("Send", variant="primary", scale=1)
             clear_btn = gr.Button("🧹 Clear chat history", scale=2)
