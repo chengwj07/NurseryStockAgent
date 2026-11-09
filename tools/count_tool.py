@@ -13,14 +13,17 @@ from tools.base import BaseTool, RegionArgs, ToolContext, ToolResult
 class CountArgs(RegionArgs):
     """Arguments of :class:`CountTool`."""
 
-    species: Optional[str] = Field(None, description="只统计该树种；省略则统计全部树种")
+    species: Optional[str] = Field(None, description="Count only this species; omit to count all species")
 
 
 class CountTool(BaseTool):
     """Count trees per species."""
 
     name = "count_trees"
-    description = "统计已提取苗木的数量（总数和分树种数量；每个连通域计一株），可按树种和范围过滤。需先提取。"
+    description = (
+        "Count the extracted trees (total and per species; each connected component counts as one tree). "
+        "Can filter by species and range. Requires prior extraction."
+    )
     args_schema = CountArgs
 
     def run(self, ctx: ToolContext, args: CountArgs) -> ToolResult:
@@ -36,10 +39,10 @@ class CountTool(BaseTool):
         _, trees = collect_trees(ctx, args, args.species)
         label = region_label(args)
         if trees.empty:
-            return ToolResult(message=f"{label}内没有符合条件的苗木（0 株）。", data={"total": 0, "by_species": {}})
+            return ToolResult(message=f"No matching trees in {label} (0 trees).", data={"total": 0, "by_species": {}})
         counts = trees["species"].value_counts()
-        lines = "\n".join(f"- {name}：{num} 株" for name, num in counts.items())
+        lines = "\n".join(f"- {name}: {num} trees" for name, num in counts.items())
         return ToolResult(
-            message=f"{label}共统计到 **{len(trees)}** 株苗木：\n{lines}",
+            message=f"Counted **{len(trees)}** trees in {label}:\n{lines}",
             data={"total": int(len(trees)), "by_species": {k: int(v) for k, v in counts.items()}},
         )

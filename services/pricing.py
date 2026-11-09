@@ -32,7 +32,7 @@ class PricingModel:
         Args:
             config: Parsed content of ``price_table.json``.
         """
-        self._currency: str = str(config.get("currency", "元"))
+        self._currency: str = str(config.get("currency", "CNY"))
         self._species: dict[str, dict[str, Any]] = dict(config.get("species", {}))
         self._alias: dict[str, str] = {}
         for name, info in self._species.items():

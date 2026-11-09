@@ -84,7 +84,7 @@ class ImageStore:
                 dst = self._dir / f"{image_id}_{src_path.stem}.tif"
                 self._convert_untagged_tiff(src_path, dst)
         else:
-            raise ValueError(f"不支持的图像格式 {suffix or src_path.name}（支持 tif/tiff/png/jpg/bmp/webp）")
+            raise ValueError(f"Unsupported image format {suffix or src_path.name} (supported: tif/tiff/png/jpg/bmp/webp)")
 
         self._ensure_overviews(dst)
         with rasterio.open(dst) as ds:
@@ -125,16 +125,16 @@ class ImageStore:
             ValueError: If the DEM cannot be used with this image.
         """
         if not record.georeferenced:
-            raise ValueError("该图像没有地理坐标，无法关联DEM")
+            raise ValueError("This image has no geographic coordinates, so a DEM cannot be attached")
         if dem_src.suffix.lower() not in {".tif", ".tiff"}:
-            raise ValueError("DEM 仅支持 GeoTIFF（.tif / .tiff）")
+            raise ValueError("The DEM must be a GeoTIFF (.tif / .tiff)")
         with rasterio.open(dem_src) as ds:
             if ds.crs is None:
-                raise ValueError("DEM 缺少坐标系")
+                raise ValueError("The DEM has no coordinate system")
             b = transform_bounds(ds.crs, "EPSG:4326", *ds.bounds)
         x0, y0, x1, y1 = record.bounds
         if b[0] >= x1 or b[2] <= x0 or b[1] >= y1 or b[3] <= y0:
-            raise ValueError("DEM 与当前图像范围不重叠")
+            raise ValueError("The DEM does not overlap the current image")
         dst = self._dir / f"{record.image_id}_dem_{dem_src.name}"
         ndsm = self._dir / f"{record.image_id}_ndsm.tif"
         shutil.copy2(dem_src, dst)
@@ -144,7 +144,7 @@ class ImageStore:
             dst.unlink(missing_ok=True)
             ndsm.unlink(missing_ok=True)
             logger.exception("DEM -> DTM failed")
-            raise ValueError(f"由DEM生成DTM失败：{exc}") from exc
+            raise ValueError(f"Failed to derive the DTM from the DEM: {exc}") from exc
         for old in (record.dem_path, record.ndsm_path):
             if old and old not in (dst, ndsm):
                 old.unlink(missing_ok=True)

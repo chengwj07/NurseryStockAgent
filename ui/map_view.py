@@ -33,13 +33,13 @@ cfg.vectors.forEach(v => {
     onEachFeature: (f, l) => {
       const p = f.properties || {};
       let tip = '<b>' + esc(p.species || '') + '</b>';
-      if (p.price_text) { tip += '<br>价格：' + esc(p.price_text); }
+      if (p.price_text) { tip += '<br>Price: ' + esc(p.price_text); }
       l.bindTooltip(tip, {sticky: true});
     }});
   overlays['🌳 ' + v.name] = layer; layer.addTo(map);
   fetch(cfg.base + '/layers/' + v.id + '.geojson?v=' + cfg.v).then(r => r.json()).then(g => layer.addData(g));
 });
-const bases = cfg.basemap ? {'OpenStreetMap': osm, '卫星影像': sat} : {};
+const bases = cfg.basemap ? {'OpenStreetMap': osm, 'Satellite imagery': sat} : {};
 L.control.layers(bases, overlays, {collapsed: false}).addTo(map);
 function fitToImage() {
   map.invalidateSize();

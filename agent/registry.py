@@ -89,7 +89,7 @@ class ToolRegistry:
                 typ = prop.get("type") or "|".join(
                     str(t.get("type", "any")) for t in prop.get("anyOf", []) if t.get("type") != "null"
                 )
-                flag = "必填" if key in required else "可选"
+                flag = "required" if key in required else "optional"
                 args.append(f"    - {key} ({typ}, {flag}): {prop.get('description', '')}")
             blocks.append(f"* {tool.name}: {tool.description}\n" + "\n".join(args))
         return "\n".join(blocks)

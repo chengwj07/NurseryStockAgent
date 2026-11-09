@@ -1,104 +1,104 @@
 {
   "asset_ledger": {
-    "label": "区域苗木资产核算表",
-    "title": "{region_name}苗木资产核算表",
-    "default_region_name": "区域",
+    "label": "Area Nursery Asset Ledger",
+    "title": "{region_name} Nursery Asset Ledger",
+    "default_region_name": "Area",
     "meta": [
       [
-        "区域名称",
+        "Area name",
         "{region_display}"
       ],
       [
-        "核算日期",
+        "Valuation date",
         "{date}"
       ],
       [
-        "数据来源",
+        "Data source",
         "{image_name}"
       ],
       [
-        "估值方式",
+        "Valuation method",
         "{mode_text}"
       ]
     ],
     "needs_price": true,
     "sheets": [
       {
-        "name": "资产核算表",
+        "name": "Asset Ledger",
         "source": "trees",
         "columns": [
           {
-            "header": "序号",
+            "header": "No.",
             "field": "index",
             "width": 8
           },
           {
-            "header": "树种",
+            "header": "Species",
             "field": "species",
-            "width": 16
+            "width": 22
           },
           {
-            "header": "等效冠幅(m)",
+            "header": "Equivalent crown width (m)",
             "field": "crown_d_m",
-            "width": 14,
+            "width": 26,
             "format": "0.00"
           },
           {
-            "header": "树高(m)",
+            "header": "Tree height (m)",
             "field": "height_m",
-            "width": 12,
+            "width": 16,
             "format": "0.00",
             "requires": "dem"
           },
           {
-            "header": "价格(元)",
+            "header": "Price (CNY)",
             "field": "price",
-            "width": 18,
+            "width": 24,
             "format": "#,##0.00"
           }
         ],
         "total": {
-          "label": "合计（共 {n} 株）",
+          "label": "Total ({n} trees)",
           "sum_fields": [
             "price"
           ]
         }
       },
       {
-        "name": "树种汇总",
+        "name": "Species Summary",
         "source": "species",
         "columns": [
           {
-            "header": "序号",
+            "header": "No.",
             "field": "index",
             "width": 8
           },
           {
-            "header": "树种",
+            "header": "Species",
             "field": "species",
-            "width": 16
+            "width": 22
           },
           {
-            "header": "数量(株)",
+            "header": "Count",
             "field": "count",
             "width": 12,
             "format": "0"
           },
           {
-            "header": "平均单价(元/株)",
+            "header": "Avg. unit price (CNY/tree)",
             "field": "avg_price",
-            "width": 18,
+            "width": 28,
             "format": "#,##0.00"
           },
           {
-            "header": "资产价值(元)",
+            "header": "Asset value (CNY)",
             "field": "value",
-            "width": 18,
+            "width": 24,
             "format": "#,##0.00"
           }
         ],
         "total": {
-          "label": "合计",
+          "label": "Total",
           "sum_fields": [
             "count",
             "value"
@@ -108,65 +108,65 @@
     ]
   },
   "plot_census": {
-    "label": "地块普查报表",
-    "title": "{region_name}普查报表",
-    "default_region_name": "地块",
+    "label": "Plot Census Report",
+    "title": "{region_name} Census Report",
+    "default_region_name": "Plot",
     "meta": [
       [
-        "地块名称",
+        "Plot name",
         "{region_display}"
       ],
       [
-        "普查日期",
+        "Census date",
         "{date}"
       ],
       [
-        "数据来源",
+        "Data source",
         "{image_name}"
       ]
     ],
     "sheets": [
       {
-        "name": "普查报表",
+        "name": "Census Report",
         "source": "species",
         "columns": [
           {
-            "header": "序号",
+            "header": "No.",
             "field": "index",
             "width": 8
           },
           {
-            "header": "树种",
+            "header": "Species",
             "field": "species",
-            "width": 16
+            "width": 22
           },
           {
-            "header": "株数",
+            "header": "Count",
             "field": "count",
             "width": 10,
             "format": "0"
           },
           {
-            "header": "占比(%)",
+            "header": "Share (%)",
             "field": "share_pct",
             "width": 12,
             "format": "0.00"
           },
           {
-            "header": "平均冠幅(m)",
+            "header": "Mean crown width (m)",
             "field": "mean_crown_d_m",
-            "width": 14,
+            "width": 22,
             "format": "0.00"
           },
           {
-            "header": "冠幅总面积(m²)",
+            "header": "Total crown area (m²)",
             "field": "total_crown_area_m2",
-            "width": 18,
+            "width": 22,
             "format": "#,##0.00"
           }
         ],
         "total": {
-          "label": "合计",
+          "label": "Total",
           "sum_fields": [
             "count",
             "share_pct",

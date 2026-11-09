@@ -77,7 +77,7 @@ def _fill_nearest(values: np.ndarray, valid: np.ndarray) -> np.ndarray:
     if valid.all():
         return values
     if not valid.any():
-        raise ValueError("DEM 没有有效像元")
+        raise ValueError("The DEM has no valid pixels")
     idx = ndimage.distance_transform_edt(~valid, return_distances=False, return_indices=True)
     return values[tuple(idx)]
 
@@ -130,7 +130,7 @@ def interpolate_dtm(z: np.ndarray, ground: np.ndarray, max_points: int = 200_000
     """
     ground = ground & np.isfinite(z)
     if not ground.any():
-        raise ValueError("滤波后没有地面点，请检查DEM或调整PMF参数")
+        raise ValueError("No ground points left after filtering; check the DEM or adjust the PMF parameters")
     dtm = np.where(ground, z, np.nan).astype(np.float32)
     todo = ~ground
     if not todo.any():
@@ -188,7 +188,7 @@ def build_ndsm(dem_path: Path, out_path: Path, params: PmfParams, strip_rows: in
     with rasterio.open(dem_path) as ds:
         tf = ds.transform
         if tf.b != 0 or tf.d != 0:
-            raise ValueError("暂不支持带旋转的DEM")
+            raise ValueError("Rotated DEMs are not supported")
         cell = math.sqrt(pixel_area_m2(ds.crs, tf, ds.height))
         factor = max(1, int(round(params.cell_size_m / cell)))
         logger.info("DEM cell %.3f m, PMF grid factor %d", cell, factor)

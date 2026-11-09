@@ -27,7 +27,7 @@ def resolve_image(ctx: ToolContext, image_id: Optional[str]) -> ImageRecord:
     """
     iid = image_id or ctx.session.current_image_id
     if iid is None or iid not in ctx.session.images:
-        raise ToolError("没有可用的图像，请先在左侧上传并选择一张图像。")
+        raise ToolError("No image is available. Upload and select an image on the left first.")
     return ctx.session.images[iid]
 
 
@@ -50,7 +50,7 @@ def collect_trees(
     image = resolve_image(ctx, args.image_id)
     trees = ctx.session.trees.get(image.image_id)
     if trees is None or trees.empty:
-        raise ToolError("当前图像还没有提取结果，请先提取苗木（extract_trees）。")
+        raise ToolError("No extraction results for the current image yet. Extract trees first (extract_trees).")
     if species:
         canonical = ctx.services.pricing.resolve(species) or species
         trees = trees[trees["species"] == canonical]
@@ -59,7 +59,7 @@ def collect_trees(
     return image, trees
 
 
-def region_label(args: RegionArgs, default: str = "区域") -> str:
+def region_label(args: RegionArgs, default: str = "Area") -> str:
     """Return a display name for the statistics range.
 
     Args:
@@ -90,7 +90,7 @@ def ensure_priced(ctx: ToolContext, image: ImageRecord) -> str:
     """
     trees = ctx.session.trees.get(image.image_id)
     if trees is None or trees.empty:
-        raise ToolError("当前图像还没有提取结果，请先提取苗木（extract_trees）。")
+        raise ToolError("No extraction results for the current image yet. Extract trees first (extract_trees).")
     priced, mode = price_trees(trees, ctx.services.pricing, image.ndsm_path)
     ctx.session.trees[image.image_id] = priced
     for layer in ctx.session.layers:

@@ -109,20 +109,20 @@ class SessionState:
         """Summarise the state for the planner prompt.
 
         Returns:
-            Multi-line Chinese description.
+            Multi-line English description.
         """
         if not self.images:
-            return "- 尚未加载任何图像"
+            return "- No image loaded yet"
         lines: list[str] = []
         for image in self.images.values():
-            mark = "（当前）" if image.image_id == self.current_image_id else ""
+            mark = " (current)" if image.image_id == self.current_image_id else ""
             gdf = self.trees.get(image.image_id)
             if gdf is None or gdf.empty:
-                extracted = "尚无提取结果"
+                extracted = "no extraction results yet"
             else:
                 counts = gdf["species"].value_counts()
-                extracted = "已提取: " + "、".join(f"{k}×{v}" for k, v in counts.items())
-            dem = "；已关联DEM" if image.dem_path else "；未关联DEM"
-            lines.append(f"- 图像 id={image.image_id} 名称={image.name}{mark}；{extracted}{dem}")
-        lines.append(f"- 已有估值结果: {'是' if self.last_valuation else '否'}")
+                extracted = "extracted: " + ", ".join(f"{k}×{v}" for k, v in counts.items())
+            dem = "; DEM attached" if image.dem_path else "; no DEM"
+            lines.append(f"- Image id={image.image_id} name={image.name}{mark}; {extracted}{dem}")
+        lines.append(f"- Valuation available: {'yes' if self.last_valuation else 'no'}")
         return "\n".join(lines)

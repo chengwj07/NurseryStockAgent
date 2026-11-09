@@ -75,19 +75,19 @@ class AgentService:
             plan = self._planner.plan(message, session, history)
         except Exception as exc:  # noqa: BLE001
             logger.exception("Planner failed")
-            yield AgentEvent("done", f"⚠️ 无法调用大模型：{exc}")
+            yield AgentEvent("done", f"⚠️ Cannot call the LLM: {exc}")
             return
 
         for attempt in range(self._settings.max_replans + 1):
             steps = self._planner.expand(plan)
             if not steps:
-                reply = plan.reply or "好的。"
-                session.history += [("用户", message), ("助手", reply)]
+                reply = plan.reply or "OK."
+                session.history += [("User", message), ("Assistant", reply)]
                 yield AgentEvent("done", reply)
                 return
 
             names = " → ".join(s.tool for s in steps)
-            yield AgentEvent("plan", f"🧭 **执行计划**：{names}\n\n")
+            yield AgentEvent("plan", f"🧭 **Execution plan**: {names}\n\n")
 
             failed: StepResult | None = None
             for idx, sr in enumerate(self._executor.run(steps, ctx), 1):
@@ -102,13 +102,13 @@ class AgentService:
                 break
             if attempt < self._settings.max_replans:
                 feedback = (
-                    f"【上一次计划在工具 {failed.step.tool} 失败：{failed.result.message}。"
-                    "请据此重新规划，必要时先补充缺失的前置步骤。】"
+                    f"[The previous plan failed at tool {failed.step.tool}: {failed.result.message}. "
+                    "Re-plan accordingly, adding any missing prerequisite steps first.]"
                 )
-                yield AgentEvent("plan", "🔁 执行失败，正在重新规划…\n\n")
+                yield AgentEvent("plan", "🔁 Execution failed, re-planning…\n\n")
                 plan = self._planner.plan(message, session, history, feedback)
             else:
                 break
 
-        session.history += [("用户", message), ("助手", " ".join(summary_parts)[:300])]
+        session.history += [("User", message), ("Assistant", " ".join(summary_parts)[:300])]
         yield AgentEvent("done", "", files)

@@ -15,23 +15,23 @@ from ui.map_view import build_map_html
 
 logger = logging.getLogger(__name__)
 
-TITLE_MD: str = """# 🌳 浙农苗木贷智能体
-**苗木资产管理智能体** · 基于遥感影像的苗木 **提取 → 统计 → 估值 → 报表 / 报告** 一体化助手。上传影像（GeoTIFF，或 PNG/JPG）后，用自然语言下达指令，例如：
-「提取罗汉松」「统计数量」「评估价值」「输出区域苗木资产核算表」「生成地块的统计报告」。"""
+TITLE_MD: str = """# 🌳 Nursery Asset Management Agent
+**Nursery Asset Management Agent** · An all-in-one assistant for remote-sensing based nursery stock: **extract → count → value → tables / reports**. Upload an image (GeoTIFF, or PNG/JPG) and give commands in natural language, for example:
+“Extract Podocarpus macrophyllus”, “Count the trees”, “Evaluate the value”, “Output the area nursery asset ledger”, “Generate the plot statistics report”."""
 
 EXAMPLES: list[str] = [
-    "提取罗汉松，并统计数量",
-    "评估当前图像中苗木的价值",
-    "输出区域苗木资产核算表",
-    "输出地块普查报表",
-    "生成地块的苗木统计报告",
+    "Extract Buddhist Pine and count the trees",
+    "Evaluate the value of the trees in the current image",
+    "Output the area nursery asset ledger",
+    "Output the plot census report",
+    "Generate the plot nursery statistics report",
 ]
 
 
 def _image_choices(session: SessionState) -> list[tuple[str, str]]:
     """Radio choices ``(label, image_id)`` of the loaded images."""
     return [
-        (f"{img.name}（含DEM）" if img.dem_path else img.name, img.image_id)
+        (f"{img.name} (with DEM)" if img.dem_path else img.name, img.image_id)
         for img in session.images.values()
     ]
 
@@ -45,9 +45,9 @@ def _make_chatbot() -> gr.Chatbot:
         The chatbot component.
     """
     try:
-        return gr.Chatbot(type="messages", height=360, label="对话")
+        return gr.Chatbot(type="messages", height=360, label="Conversation")
     except TypeError:
-        return gr.Chatbot(height=360, label="对话")
+        return gr.Chatbot(height=360, label="Conversation")
 
 
 def build_demo(services: Services, agent: AgentService) -> gr.Blocks:
@@ -76,7 +76,7 @@ def build_demo(services: Services, agent: AgentService) -> gr.Blocks:
                 record = services.image_store.register(Path(f))
             except Exception as exc:  # noqa: BLE001
                 logger.exception("Upload failed")
-                gr.Warning(f"加载失败：{exc}")
+                gr.Warning(f"Failed to load: {exc}")
                 continue
             session.images[record.image_id] = record
             session.current_image_id = record.image_id
@@ -93,21 +93,21 @@ def build_demo(services: Services, agent: AgentService) -> gr.Blocks:
         if not files:
             return session, gr.update()
         if iid is None or iid not in session.images:
-            gr.Warning("请先上传并选择一张原图，再上传DEM。")
+            gr.Warning("Upload and select an original image first, then upload the DEM.")
             return session, gr.update()
-        gr.Info("正在由 DEM 生成 DTM（渐进形态学滤波），大影像可能需要几分钟…")
+        gr.Info("Deriving the DTM from the DEM (progressive morphological filter); large images may take a few minutes…")
         path = Path(files if isinstance(files, str) else files[-1])
         try:
             services.image_store.attach_dem(session.images[iid], path)
         except Exception as exc:  # noqa: BLE001
             logger.exception("DEM upload failed")
-            gr.Warning(f"DEM 关联失败：{exc}")
+            gr.Warning(f"Failed to attach the DEM: {exc}")
             return session, gr.update()
         trees = session.trees.get(iid)
         if trees is not None:  # cached heights / prices belong to the old DEM state
             session.trees[iid] = trees.drop(columns=["height_m", "price", "price_text"], errors="ignore")
         session.last_valuation = None
-        gr.Info("已关联DEM（已生成DTM），之后的资产评估将使用「原图+DEM」公式；已评估过的请重新评估。")
+        gr.Info("DEM attached (DTM generated). Later valuations use the “original image + DEM” formulas; re-run any valuation you already did.")
         return session, gr.update(choices=_image_choices(session), value=iid)
 
     def on_select(image_id: Optional[str], session: SessionState) -> tuple[Any, ...]:
@@ -138,7 +138,7 @@ def build_demo(services: Services, agent: AgentService) -> gr.Blocks:
         if not message:
             yield chat, "", session, gr.update(), gr.update()
             return
-        chat = chat + [{"role": "user", "content": message}, {"role": "assistant", "content": "⏳ 正在解析意图…"}]
+        chat = chat + [{"role": "user", "content": message}, {"role": "assistant", "content": "⏳ Parsing your request…"}]
         yield chat, "", session, gr.update(), gr.update()
         answer = ""
         files: list[str] = []
@@ -146,7 +146,7 @@ def build_demo(services: Services, agent: AgentService) -> gr.Blocks:
         for event in agent.stream(message, session):
             answer += event.text
             files = event.files or files
-            chat[-1] = {"role": "assistant", "content": answer or "⏳ 处理中…"}
+            chat[-1] = {"role": "assistant", "content": answer or "⏳ Working…"}
             map_update: Any = gr.update()
             if session.version != version:
                 version = session.version
@@ -154,7 +154,7 @@ def build_demo(services: Services, agent: AgentService) -> gr.Blocks:
             yield chat, "", session, map_update, (files or gr.update())
         yield chat, "", session, render_map(session), (files or gr.update())
 
-    with gr.Blocks(title="浙农苗木贷智能体") as demo:
+    with gr.Blocks(title="Zhenong Nursery-Loan Agent") as demo:
         session_state = gr.State(lambda: SessionState())
 
         # ---- Top: title ----
@@ -163,31 +163,31 @@ def build_demo(services: Services, agent: AgentService) -> gr.Blocks:
         # ---- Middle: image manager | map ----
         with gr.Row(equal_height=False):
             with gr.Column(scale=1, min_width=260):
-                gr.Markdown("### 图像管理")
+                gr.Markdown("### Image Management")
                 upload = gr.UploadButton(
-                    "📤 上传图像 (GeoTIFF / PNG / JPG)",
+                    "📤 Upload Image (GeoTIFF / PNG / JPG)",
                     file_types=[".tif", ".tiff", ".png", ".jpg", ".jpeg", ".bmp", ".webp"],
                     file_count="multiple",
                 )
-                image_list = gr.Radio(choices=[], label="已加载图像（点击切换当前图像）")
+                image_list = gr.Radio(choices=[], label="Loaded images (click to switch the current image)")
                 dem_upload = gr.UploadButton(
-                    "⛰ 为当前图像上传DEM（可选）", file_types=[".tif", ".tiff"], file_count="single"
+                    "⛰ Upload DEM for the current image (optional)", file_types=[".tif", ".tiff"], file_count="single"
                 )
-                remove_btn = gr.Button("🗑 移除当前图像", size="sm")
+                remove_btn = gr.Button("🗑 Remove current image", size="sm")
             with gr.Column(scale=4):
                 map_html = gr.HTML(render_map(SessionState()))
 
         # ---- Bottom: agent chat ----
-        gr.Markdown("### 智能体对话")
+        gr.Markdown("### Agent Chat")
         chatbot = _make_chatbot()
         with gr.Row():
             textbox = gr.Textbox(
-                placeholder="输入指令，如：提取罗汉松并统计数量", show_label=False, scale=8, lines=1
+                placeholder="Type a command, e.g. extract Buddhist Pine and count the trees", show_label=False, scale=8, lines=1
             )
-            send_btn = gr.Button("发送", variant="primary", scale=1)
-            clear_btn = gr.Button("🧹 清空聊天记录", scale=2)
-        gr.Examples(EXAMPLES, inputs=textbox, label="示例指令")
-        out_files = gr.File(label="生成的文件（报表 / 报告）", file_count="multiple", interactive=False)
+            send_btn = gr.Button("Send", variant="primary", scale=1)
+            clear_btn = gr.Button("🧹 Clear chat history", scale=2)
+        gr.Examples(EXAMPLES, inputs=textbox, label="Example commands")
+        out_files = gr.File(label="Generated files (tables / reports)", file_count="multiple", interactive=False)
 
         # ---- Events ----
         upload.upload(on_upload, [upload, session_state], [session_state, image_list, map_html])

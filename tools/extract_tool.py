@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 class ExtractArgs(BaseModel):
     """Arguments of :class:`ExtractTool`."""
 
-    type_name: str = Field(..., description="苗木类型名称，如 罗汉松、香樟")
-    image_id: Optional[str] = Field(None, description="图像id，省略则使用当前图像")
+    type_name: str = Field(..., description="Tree type name, e.g. Buddhist Pine, Camphor Tree")
+    image_id: Optional[str] = Field(None, description="Image id; omit to use the current image")
 
 
 class ExtractTool(BaseTool):
@@ -27,8 +27,9 @@ class ExtractTool(BaseTool):
 
     name = "extract_trees"
     description = (
-        "在图像中按苗木类型名称调用SAM3分割提取苗木：合并所有窗口结果为栅格，填补空洞、清除碎屑后做连通域分析得到数量，结果保存到会话并作为图层显示在地图上。"
-        "统计、估值、制表、报告都依赖该工具的结果。"
+        "Extract the trees of a given type from the image with SAM3: the results of all windows are merged into one raster, "
+        "holes are filled and debris removed, then connected-component analysis gives the count. The result is stored in the "
+        "session and shown on the map as a layer. Counting, valuation, tables and reports all depend on this tool."
     )
     args_schema = ExtractArgs
 
@@ -49,7 +50,7 @@ class ExtractTool(BaseTool):
         pricing = ctx.services.pricing
         species = pricing.resolve(args.type_name) or args.type_name.strip()
         if not species:
-            raise ToolError("苗木类型名称不能为空。")
+            raise ToolError("The tree type name must not be empty.")
         prompt = pricing.prompt_for(args.type_name)
         logger.info("Extract %s (prompt=%r) from %s", species, prompt, image.name)
 
@@ -66,7 +67,7 @@ class ExtractTool(BaseTool):
         ctx.session.trees[image.image_id] = gdf_all
 
         if gdf.empty:
-            return ToolResult(message=f"在「{image.name}」中没有检测到**{species}**。", data={"count": 0})
+            return ToolResult(message=f"No **{species}** detected in “{image.name}”.", data={"count": 0})
 
         layer_name = f"{species} ({image.name})"
         ctx.session.layers = [l for l in ctx.session.layers if l.name != layer_name]
@@ -74,9 +75,9 @@ class ExtractTool(BaseTool):
         layer.image_id, layer.species = image.image_id, species
         ctx.session.layers.append(layer)
         ctx.session.touch()
-        note = "" if image.georeferenced else "\n\n> ⚠️ 该图像无地理坐标，冠幅/面积按 1 像素 = 配置的像元尺寸（默认 1 米）估算，仅供参考。"
+        note = "" if image.georeferenced else "\n\n> ⚠️ This image has no geographic coordinates; crown width / area are estimated with 1 pixel = the configured pixel size (default 1 m) and are for reference only."
         return ToolResult(
-            message=f"已在「{image.name}」中提取 **{len(gdf)}** 株{species}（提示词 `{prompt}`），已添加到地图图层「{layer_name}」。{note}",
+            message=f"Extracted **{len(gdf)}** trees of {species} in “{image.name}” (prompt `{prompt}`); added as map layer “{layer_name}”.{note}",
             data={
                 "count": len(gdf), "species": species, "layer_id": layer.layer_id,
                 "raw_instances": result.raw_instances, "raw_components": stats.raw_components,

@@ -52,13 +52,13 @@ class ToolContext:
 class RegionArgs(BaseModel):
     """Common arguments selecting an image and a statistics range."""
 
-    image_id: Optional[str] = Field(None, description="图像id，省略则使用当前图像")
-    region_name: Optional[str] = Field(None, description="区域/地块名称，用于报表标题")
+    image_id: Optional[str] = Field(None, description="Image id; omit to use the current image")
+    region_name: Optional[str] = Field(None, description="Area / plot name, used in report titles")
     bbox: Optional[list[float]] = Field(
-        None, description="统计范围[minx,miny,maxx,maxy]，经纬度(EPSG:4326)；省略表示整幅图像"
+        None, description="Statistics range [minx,miny,maxx,maxy] in lon/lat (EPSG:4326); omit for the whole image"
     )
     region_vector_path: Optional[str] = Field(
-        None, description="范围矢量文件(shp/geojson)路径；省略表示不按矢量裁剪"
+        None, description="Path of a range vector file (shp/geojson); omit for no vector clipping"
     )
 
     @field_validator("bbox")
@@ -66,7 +66,7 @@ class RegionArgs(BaseModel):
     def _check_bbox(cls, value: Optional[list[float]]) -> Optional[list[float]]:
         """Validate that ``bbox`` has four numbers."""
         if value is not None and len(value) != 4:
-            raise ValueError("bbox 必须是 [minx, miny, maxx, maxy]")
+            raise ValueError("bbox must be [minx, miny, maxx, maxy]")
         return value
 
 

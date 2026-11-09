@@ -56,7 +56,7 @@ class Executor:
                 result = out if isinstance(out, ToolResult) else ToolResult(message=str(out))
             except Exception as exc:  # noqa: BLE001 - tool failures must not crash the app
                 logger.exception("Tool %s crashed", step.tool)
-                result = ToolResult(success=False, message=f"工具 {step.tool} 执行出错：{exc}")
+                result = ToolResult(success=False, message=f"Tool {step.tool} failed: {exc}")
             yield StepResult(step=step, result=result)
             if not result.success:
                 return

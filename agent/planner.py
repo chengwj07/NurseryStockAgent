@@ -18,35 +18,35 @@ from agent.state import SessionState
 
 logger = logging.getLogger(__name__)
 
-SYSTEM_PROMPT: str = """你是"苗木资产管理智能体"的【规划器(Planner)】。你只负责：①理解用户意图 ②把需求拆解成对工具的调用计划。\
-你不做任何计算，不编造任何数字；统计、估值、制表等结果全部由工具产出。
+SYSTEM_PROMPT: str = """You are the PLANNER of the "Nursery Asset Management Agent". You are only responsible for: (1) understanding the user's intent and (2) breaking the request down into a plan of tool calls. \
+You never compute anything and never invent numbers; all counting, valuation and table results are produced by the tools.
 
-## 可用工具
+## Available tools
 {tool_catalog}
 
-## 预制计划（用户需求与之吻合时优先使用）
+## Preset plans (prefer them when the request matches)
 {preset_catalog}
 
-## 输出格式（只输出一个JSON对象，不要解释，不要Markdown代码块）
-情况A 使用预制计划: {{"preset": "<预制计划名>", "params": {{...}}}}
-情况B 自定义计划: {{"steps": [{{"tool": "<工具名>", "args": {{...}}}}, ...]}}
-情况C 闲聊 / 信息不足需追问 / 确实无法完成: {{"reply": "<对用户说的话>"}}
+## Output format (output exactly one JSON object; no explanations, no Markdown code fences)
+Case A, use a preset plan: {{"preset": "<preset name>", "params": {{...}}}}
+Case B, custom plan: {{"steps": [{{"tool": "<tool name>", "args": {{...}}}}, ...]}}
+Case C, small talk / missing information that needs a follow-up question / truly impossible: {{"reply": "<what to say to the user>"}}
 
-## 规则
-1. 只能使用上面列出的工具名；args 只能包含该工具列出的参数；不确定的可选参数直接省略。
-2. 工具间通过会话状态传递数据（提取结果会被后续统计/估值/制表/报告自动读取），不要在args里传结果。
-3. 统计、估值、制表、报告之前必须已有提取结果：会话状态里已提取过该树种则不要重复提取，否则先加入 extract_trees 步骤。
-4. 非预制需求：优先用已有工具组合解决，不要轻易拒绝；确实做不到时才用情况C说明原因。
-5. 没有已加载图像时使用情况C提醒用户先上传图像。
+## Rules
+1. Use only the tool names listed above; args may only contain the parameters listed for that tool; omit optional parameters you are unsure about.
+2. Tools pass data through the session state (extraction results are read automatically by the later count / valuation / table / report tools); never pass results in args.
+3. Counting, valuation, tables and reports require existing extraction results: if the session state shows the species is already extracted, do not extract it again; otherwise add an extract_trees step first.
+4. For non-preset requests, solve them by combining the existing tools and do not refuse lightly; use Case C only when it truly cannot be done.
+5. If no image is loaded, use Case C to ask the user to upload an image first.
 """
 
-HUMAN_PROMPT: str = """## 会话状态
+HUMAN_PROMPT: str = """## Session state
 {session_state}
 
-## 最近对话
+## Recent conversation
 {history}
 
-## 用户请求
+## User request
 {user_input}
 {feedback}"""
 
@@ -74,7 +74,7 @@ class Plan(BaseModel):
     def _non_empty(self) -> "Plan":
         """Require at least one of preset / steps / reply."""
         if not (self.preset or self.steps or self.reply):
-            raise ValueError("计划必须包含 preset、steps 或 reply 之一")
+            raise ValueError("A plan must contain preset, steps or reply")
         return self
 
 
@@ -101,7 +101,7 @@ def extract_json(text: str) -> dict[str, Any]:
             continue
         if isinstance(obj, dict):
             return obj
-    raise PlanError("输出中没有找到JSON对象")
+    raise PlanError("No JSON object found in the output")
 
 
 class Planner:
@@ -140,10 +140,10 @@ class Planner:
             PlanError: If an unknown tool or preset is referenced.
         """
         if plan.preset and plan.preset not in self._presets:
-            raise PlanError(f"未知预制计划 {plan.preset!r}")
+            raise PlanError(f"Unknown preset plan {plan.preset!r}")
         for step in plan.steps:
             if step.tool not in self._tools:
-                raise PlanError(f"未知工具 {step.tool!r}")
+                raise PlanError(f"Unknown tool {step.tool!r}")
 
     def expand(self, plan: Plan) -> list[PlanStep]:
         """Resolve a plan to concrete steps.
@@ -180,7 +180,7 @@ class Planner:
                     "tool_catalog": self._tools.catalog(),
                     "preset_catalog": self._presets.catalog(),
                     "session_state": session.describe(),
-                    "history": history or "（无）",
+                    "history": history or "(none)",
                     "user_input": user_input,
                     "feedback": feedback + note,
                 }
@@ -193,5 +193,5 @@ class Planner:
                 return plan
             except (PlanError, ValidationError, ValueError) as exc:
                 logger.warning("Invalid plan (attempt %d): %s", attempt, exc)
-                note = f"\n【你上一次的输出不合法：{exc}。请严格按格式重新输出一个JSON对象。】"
-        return Plan(reply="抱歉，我没能理解这个需求，能换一种说法或说得更具体一些吗？")
+                note = f"\n[Your previous output was invalid: {exc}. Output exactly one JSON object in the required format.]"
+        return Plan(reply="Sorry, I could not understand that request. Could you rephrase it or be more specific?")

@@ -27,7 +27,7 @@ def build_chat_model(settings: Settings) -> BaseChatModel:
     """
     if settings.llm_mode == "llamacpp":
         if not settings.llamacpp_model_path:
-            raise ValueError("llamacpp 模式需要设置 NURSERY_LLAMACPP_MODEL_PATH")
+            raise ValueError("llamacpp mode requires NURSERY_LLAMACPP_MODEL_PATH")
         from langchain_community.chat_models import ChatLlamaCpp
 
         logger.info("Loading llama.cpp model: %s", settings.llamacpp_model_path)
@@ -41,7 +41,7 @@ def build_chat_model(settings: Settings) -> BaseChatModel:
         )
 
     if not settings.api_model:
-        raise ValueError("api 模式需要设置 NURSERY_API_MODEL（以及 NURSERY_API_BASE_URL / NURSERY_API_KEY）")
+        raise ValueError("api mode requires NURSERY_API_MODEL (and NURSERY_API_BASE_URL / NURSERY_API_KEY)")
     from langchain_openai import ChatOpenAI
 
     logger.info("Using API model at %s", settings.api_base_url)

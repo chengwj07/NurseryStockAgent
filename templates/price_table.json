@@ -1,44 +1,126 @@
 {
-  "_comment": "树种配置。prompt=给SAM3的英文提示词(可自行修改)；formulas=逐棵估价公式，没有 formulas 的树种提取后评估时显示'无评估公式'。公式 V=coef*H^h_exp*W^w_exp，coef 也可写成 ln_coef (即 coef=exp(ln_coef))；W=等效冠幅(厘米)，H=树高(厘米)，即冠幅内 DEM−DTM 的最高值，DTM 由DEM经PMF滤波得到。single=仅原图，dem=原图+DEM。",
-  "currency": "元",
+  "_comment": "Species configuration. prompt = English text prompt sent to SAM3 (edit freely); aliases = other names that resolve to the species (the Chinese names are kept so Chinese input still works); formulas = per-tree price formulas, species without 'formulas' show 'No valuation formula' when valued. Formula V = coef * H^h_exp * W^w_exp; coef may also be given as ln_coef (coef = exp(ln_coef)). W = equivalent crown width (cm), H = tree height (cm) = highest DEM-DTM value inside the crown, the DTM being derived from the DEM with PMF filtering. single = original image only, dem = original image + DEM.",
+  "currency": "CNY",
   "species": {
-    "罗汉松": {
-      "prompt": "podocarpus macrophyllus",
-      "aliases": ["Podocarpus"],
+    "Buddhist Pine": {
+      "prompt": "buddhist pine",
+      "aliases": [
+        "罗汉松",
+        "Podocarpus",
+        "Podocarpus macrophyllus"
+      ],
       "formulas": {
-        "single": {"ln_coef": -4.798, "w_exp": 2.272},
-        "dem": {"ln_coef": -4.798, "w_exp": 2.272}
+        "single": {
+          "ln_coef": -4.798,
+          "w_exp": 2.272
+        },
+        "dem": {
+          "ln_coef": -4.798,
+          "w_exp": 2.272
+        }
       }
     },
-    "红花继木": {
-      "prompt": "loropetalum chinense",
-      "aliases": ["红花檵木", "红继木"],
+    "Red Loropetalum": {
+      "prompt": "red loropetalum shrub",
+      "aliases": [
+        "红花继木",
+        "红花檵木",
+        "红继木",
+        "Loropetalum",
+        "Red-flowered Loropetalum"
+      ],
       "formulas": {
-        "single": {"ln_coef": -8.504, "w_exp": 2.758},
-        "dem": {"coef": 5.432e-06, "h_exp": 2.332, "w_exp": 1.193}
+        "single": {
+          "ln_coef": -8.504,
+          "w_exp": 2.758
+        },
+        "dem": {
+          "coef": 5.432e-06,
+          "h_exp": 2.332,
+          "w_exp": 1.193
+        }
       }
     },
-    "茶梅": {
-      "prompt": "sasanqua camellia",
-      "aliases": [],
+    "Sasanqua Camellia": {
+      "prompt": "sasanqua camellia shrub",
+      "aliases": [
+        "茶梅",
+        "Camellia sasanqua"
+      ],
       "formulas": {
-        "single": {"ln_coef": -5.4, "w_exp": 2.232},
-        "dem": {"coef": 0.001521, "h_exp": 0.9309, "w_exp": 1.534}
+        "single": {
+          "ln_coef": -5.4,
+          "w_exp": 2.232
+        },
+        "dem": {
+          "coef": 0.001521,
+          "h_exp": 0.9309,
+          "w_exp": 1.534
+        }
       }
     },
-    "亮晶女贞": {
-      "prompt": "ligustrum quihoui",
-      "aliases": ["亮晶女真"],
+    "Glossy Privet": {
+      "prompt": "glossy privet shrub",
+      "aliases": [
+        "亮晶女贞",
+        "亮晶女真"
+      ],
       "formulas": {
-        "single": {"ln_coef": -7.065, "w_exp": 2.562},
-        "dem": {"coef": 0.0001728, "h_exp": 0.8448, "w_exp": 2.038}
+        "single": {
+          "ln_coef": -7.065,
+          "w_exp": 2.562
+        },
+        "dem": {
+          "coef": 0.0001728,
+          "h_exp": 0.8448,
+          "w_exp": 2.038
+        }
       }
     },
-    "香樟": {"prompt": "camphor tree", "aliases": ["樟树"]},
-    "桂花": {"prompt": "osmanthus tree", "aliases": ["桂花树"]},
-    "银杏": {"prompt": "ginkgo tree", "aliases": ["白果树"]},
-    "红枫": {"prompt": "red maple tree", "aliases": ["鸡爪槭"]},
-    "紫薇": {"prompt": "crape myrtle tree", "aliases": ["痒痒树"]},
-    "樱花": {"prompt": "cherry blossom tree", "aliases": []}
+    "Camphor Tree": {
+      "prompt": "camphor tree",
+      "aliases": [
+        "香樟",
+        "樟树",
+        "Camphor"
+      ]
+    },
+    "Osmanthus": {
+      "prompt": "osmanthus tree",
+      "aliases": [
+        "桂花",
+        "桂花树",
+        "Osmanthus Tree"
+      ]
+    },
+    "Ginkgo": {
+      "prompt": "ginkgo tree",
+      "aliases": [
+        "银杏",
+        "白果树",
+        "Ginkgo Tree"
+      ]
+    },
+    "Red Maple": {
+      "prompt": "red maple tree",
+      "aliases": [
+        "红枫",
+        "鸡爪槭",
+        "Japanese Maple"
+      ]
+    },
+    "Crape Myrtle": {
+      "prompt": "crape myrtle tree",
+      "aliases": [
+        "紫薇",
+        "痒痒树"
+      ]
+    },
+    "Cherry Blossom": {
+      "prompt": "cherry blossom tree",
+      "aliases": [
+        "樱花"
+      ]
+    }
   }
 }

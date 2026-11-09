@@ -14,8 +14,8 @@ from services.pricing import PricingModel
 
 logger = logging.getLogger(__name__)
 
-NO_FORMULA: str = "无评估公式"
-NO_HEIGHT: str = "无高度数据"
+NO_FORMULA: str = "No valuation formula"
+NO_HEIGHT: str = "No height data"
 
 Mode = Literal["single", "dem"]
 

@@ -33,7 +33,7 @@ class TableArgs(RegionArgs):
 
     template: str = Field(
         ...,
-        description="报表模板: asset_ledger(区域苗木资产核算表，逐棵列出冠幅/树高/价格并合计) 或 plot_census(地块普查报表)",
+        description="Report template: asset_ledger (area nursery asset ledger: lists crown width / height / price of every tree and the total) or plot_census (plot census report)",
     )
 
 
@@ -47,8 +47,9 @@ class TableTool(BaseTool):
 
     name = "generate_table"
     description = (
-        "根据内置报表模板输出Excel报表：asset_ledger=区域苗木资产核算表（逐棵列出冠幅、树高(有DEM时)、价格并计算总价格），"
-        "plot_census=地块普查报表。需先提取。"
+        "Export an Excel report from a built-in template: asset_ledger = area nursery asset ledger (lists the crown width, "
+        "tree height (with a DEM) and price of every tree and computes the total price), plot_census = plot census report. "
+        "Requires prior extraction."
     )
     args_schema = TableArgs
 
@@ -69,14 +70,14 @@ class TableTool(BaseTool):
         templates: dict[str, dict[str, Any]] = json.loads(path.read_text(encoding="utf-8"))
         tpl = templates.get(args.template)
         if tpl is None:
-            raise ToolError(f"未知报表模板 {args.template!r}，可选：{', '.join(templates)}")
+            raise ToolError(f"Unknown report template {args.template!r}; available: {', '.join(templates)}")
 
         mode = "single"
         if tpl.get("needs_price"):
             mode = ensure_priced(ctx, resolve_image(ctx, args.image_id))
         image, trees = collect_trees(ctx, args)
         if trees.empty:
-            raise ToolError("指定范围内没有苗木，无法生成报表。")
+            raise ToolError("No trees in the selected range; cannot generate the table.")
         summary = species_summary(trees, ctx.services.pricing)
         summary.insert(0, "index", range(1, len(summary) + 1))
         species_rows = summary.to_dict("records")
@@ -92,10 +93,10 @@ class TableTool(BaseTool):
                 rec["height_m"] = "—"
         sources = {"species": species_rows, "trees": tree_rows}
 
-        region = region_label(args, tpl.get("default_region_name", "区域"))
+        region = region_label(args, tpl.get("default_region_name", "Area"))
         fmt = {
             "region_name": region,
-            "region_display": (args.region_name or "").strip() or "未指定",
+            "region_display": (args.region_name or "").strip() or "Not specified",
             "date": datetime.now().strftime("%Y-%m-%d"),
             "image_name": image.name,
             "mode_text": MODE_TEXT[mode],
@@ -112,9 +113,9 @@ class TableTool(BaseTool):
         total_text = ""
         if tpl.get("needs_price"):
             total = sum(float(r["price"]) for r in tree_rows if _is_number(r["price"]))
-            total_text = f"，总价格 {total:,.2f} {ctx.services.pricing.currency}"
+            total_text = f", total price {total:,.2f} {ctx.services.pricing.currency}"
         return ToolResult(
-            message=f"已生成「{title}」（{len(tree_rows)} 株，{len(species_rows)} 个树种{total_text}），可在下方下载。",
+            message=f"Generated “{title}” ({len(tree_rows)} trees, {len(species_rows)} species{total_text}); download it below.",
             files=[str(out_path)],
             data={"template": args.template, "rows": len(tree_rows)},
         )

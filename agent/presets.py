@@ -82,8 +82,8 @@ class PresetRegistry:
         """Render the preset list for the planner prompt."""
         lines = []
         for p in self._items.values():
-            params = "、".join(f"{k}({v})" for k, v in p.params.items())
-            lines.append(f"* {p.name}: {p.description} 参数: {params}")
+            params = ", ".join(f"{k} ({v})" for k, v in p.params.items())
+            lines.append(f"* {p.name}: {p.description} Params: {params}")
         return "\n".join(lines)
 
 
@@ -119,11 +119,11 @@ def _full_census(p: dict[str, Any]) -> list[PlanStep]:
 
 
 def _builtin_presets() -> list[PresetPlan]:
-    common = {"type_name": "苗木类型名", "image_id": "可选", "region_name": "可选", "bbox": "可选"}
+    common = {"type_name": "tree type name", "image_id": "optional", "region_name": "optional", "bbox": "optional"}
     return [
-        PresetPlan("extract_and_count", "提取某类苗木并统计数量", common, _extract_count),
-        PresetPlan("extract_and_value", "提取某类苗木、统计数量并做资产评估", common, _value_pipeline),
-        PresetPlan("full_census", "一键完成提取、统计、资产评估、两张报表和Word报告", common, _full_census),
+        PresetPlan("extract_and_count", "Extract one tree type and count the trees.", common, _extract_count),
+        PresetPlan("extract_and_value", "Extract one tree type, count the trees and run the asset valuation.", common, _value_pipeline),
+        PresetPlan("full_census", "One click: extract, count, value, both Excel tables and the Word report.", common, _full_census),
     ]
 
 
