@@ -67,7 +67,7 @@ tests/                  # Smoke tests with a fake LLM and mock segmentation
 
 - Python environment with dependencies listed in `requirements.txt`.
 - SAM3 installed according to its [official repository](https://github.com/facebookresearch/sam3) for real segmentation.
-- For possible SAM3 install and load error, please refer to [SAM3 Troubleshooting](./docs/SAM3_TROUBLESHOOTING.md).
+- For possible SAM3 install and load error, please refer to [SAM3 Troubleshooting](https://github.com/chengwj07/NurseryStockAgent/blob/main/docs/SAM3_Troubleshooting.md).
 - An accessible LLM api key, or a local GGUF model with `llama-cpp-python`.
 - GPU resources as appropriate for the chosen segmentation and LLM backends.
 
