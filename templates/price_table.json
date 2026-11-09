@@ -2,12 +2,13 @@
   "_comment": "Species configuration. prompt = English text prompt sent to SAM3 (edit freely); aliases = other names that resolve to the species (the Chinese names are kept so Chinese input still works); formulas = per-tree price formulas, species without 'formulas' show 'No valuation formula' when valued. Formula V = coef * H^h_exp * W^w_exp; coef may also be given as ln_coef (coef = exp(ln_coef)). W = equivalent crown width (cm), H = tree height (cm) = highest DEM-DTM value inside the crown, the DTM being derived from the DEM with PMF filtering. single = original image only, dem = original image + DEM.",
   "currency": "CNY",
   "species": {
-    "Buddhist Pine": {
-      "prompt": "buddhist pine",
+    "podocarpus macrophyllus": {
+      "prompt": "podocarpus macrophyllus",
       "aliases": [
         "罗汉松",
         "Podocarpus",
-        "Podocarpus macrophyllus"
+        "Podocarpus macrophyllus",
+        "Buddhist Pine"
       ],
       "formulas": {
         "single": {
@@ -20,8 +21,8 @@
         }
       }
     },
-    "Red Loropetalum": {
-      "prompt": "red loropetalum shrub",
+    "loropetalum chinense": {
+      "prompt": "loropetalum chinense",
       "aliases": [
         "红花继木",
         "红花檵木",
@@ -41,11 +42,11 @@
         }
       }
     },
-    "Sasanqua Camellia": {
-      "prompt": "sasanqua camellia shrub",
+    "sasanqua camellia": {
+      "prompt": "sasanqua camellia",
       "aliases": [
         "茶梅",
-        "Camellia sasanqua"
+        "camellia sasanqua"
       ],
       "formulas": {
         "single": {
@@ -59,7 +60,7 @@
         }
       }
     },
-    "Glossy Privet": {
+    "ligustrum quihoui": {
       "prompt": "glossy privet shrub",
       "aliases": [
         "亮晶女贞",
