@@ -65,8 +65,8 @@ tests/                  # Smoke tests with a fake LLM and mock segmentation
 
 ### Requirements
 
-- Python environment with dependencies listed in `requirements.txt`.
 - SAM3 installed according to its [official repository](https://github.com/facebookresearch/sam3) for real segmentation.
+- Python environment with dependencies listed in `requirements.txt`.
 - For possible SAM3 install and load error, please refer to [SAM3 Troubleshooting](https://github.com/chengwj07/NurseryStockAgent/blob/main/docs/SAM3_Troubleshooting.md).
 - An accessible LLM api key, or a local GGUF model with `llama-cpp-python`.
 - GPU resources as appropriate for the chosen segmentation and LLM backends.
@@ -84,7 +84,13 @@ python app.py
 
 Open **http://127.0.0.1:7860** in a browser.
 
-For interface development without a segmentation model, set `NURSERY_SEG_BACKEND=mock`. **Mock mode generates synthetic/random crowns and must not be used to report scientific results.** An LLM configuration is still required.
+### Quick start with sample data
+
+A sample podocarpus macrophyllus nursery UAV image is provided in the assets/ directory for testing and demonstration purposes.
+
+After launching the application, upload the sample image through the web interface and use natural-language instructions to test the agent's segmentation, inventory analysis, and reporting capabilities.
+
+Note: For interface development without a segmentation model, set NURSERY_SEG_BACKEND=mock. Mock mode generates synthetic/random crowns and must not be used to report scientific results. An LLM configuration is still required.
 
 ### LLM configuration
 
