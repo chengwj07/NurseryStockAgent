@@ -1,4 +1,4 @@
-# _From UAV Imagery to Nursery Stock Value with Vision Foundation Models and an LLM Agent_
+# _From UAV Imagery to Asset Value with Vision Foundation Models and an LLM Agent_
 
 The **Nursery Stock Agent** is a research prototype for extracting, inventorying, and valuing nursery stock from UAV imagery through a natural-language interface. It combines a **Gradio** interface, a **Leaflet** map, a **LangChain-based Planner–Executor agent**, **SAM3**-based crown extraction, and deterministic Python tools for counting, valuation, and report generation.
 
