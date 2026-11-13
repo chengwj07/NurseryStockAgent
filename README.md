@@ -1,5 +1,8 @@
 # _From UAV Imagery to Asset Value with Vision Foundation Models and an LLM Agent_
 
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24123223.svg)](https://doi.org/10.5281/zenodo.24123223)
+  
 The **Nursery Stock Agent** is a research prototype for extracting, inventorying, and valuing nursery stock from UAV imagery through a natural-language interface. It combines a **Gradio** interface, a **Leaflet** map, a **LangChain-based Planner–Executor agent**, **SAM3**-based crown extraction, and deterministic Python tools for counting, valuation, and report generation.
 
 ## 1. Features
@@ -66,6 +69,7 @@ tests/                  # Smoke tests with a fake LLM and mock segmentation
 ### Requirements
 
 - SAM3 installed according to its [official repository](https://github.com/facebookresearch/sam3) for real segmentation.
+- Fine-tuned SAM3 checkpoints are available on [Zenodo](https://doi.org/10.5281/zenodo.24123223)
 - Python environment with dependencies listed in `requirements.txt`.
 - For possible SAM3 install and load error, please refer to [SAM3 Troubleshooting](https://github.com/chengwj07/NurseryStockAgent/blob/main/docs/SAM3_Troubleshooting.md).
 - An accessible LLM api key, or a local GGUF model with `llama-cpp-python`.
