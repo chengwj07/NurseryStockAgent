@@ -205,7 +205,8 @@ class ReportTool(BaseTool):
         out_dir = ctx.services.settings.output_dir / "reports"
         out_dir.mkdir(parents=True, exist_ok=True)
         stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        out_path = out_dir / f"{re.sub(r'[\\/:*?\"<>|]', '_', title)}_{stamp}.docx"
+        safe_title = re.sub(r'[\\/:*?"<>|]', '_', title)
+        out_path = out_dir / f"{safe_title}_{stamp}.docx"
         doc.save(out_path)
         logger.info("Report written: %s", out_path)
         value_part = f", total price {total_value:,.2f} {cur}" if summary["has_formula"].any() else ""

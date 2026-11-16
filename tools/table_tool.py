@@ -106,7 +106,8 @@ class TableTool(BaseTool):
         out_dir = ctx.services.settings.output_dir / "tables"
         out_dir.mkdir(parents=True, exist_ok=True)
         stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        out_path = out_dir / f"{re.sub(r'[\\/:*?\"<>|]', '_', title)}_{stamp}.xlsx"
+        safe_title = re.sub(r'[\\/:*?"<>|]', '_', title)  
+        out_path = out_dir / f"{safe_title}_{stamp}.xlsx"
         self._write_workbook(out_path, tpl, title, fmt, sources, mode)
         logger.info("Table written: %s", out_path)
 
