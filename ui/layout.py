@@ -154,7 +154,7 @@ def build_demo(services: Services, agent: AgentService) -> gr.Blocks:
             yield chat, "", session, map_update, (files or gr.update())
         yield chat, "", session, render_map(session), (files or gr.update())
 
-    with gr.Blocks(title="Zhenong Nursery-Loan Agent") as demo:
+    with gr.Blocks(title="Nursery Management Agent") as demo:
         session_state = gr.State(lambda: SessionState())
 
         # ---- Top: title ----
